@@ -1,72 +1,55 @@
 <?php
 
-namespace App\Controller;
+namespace src\Controller;
 
-use App\Service\FirebaseAuthService;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Routing\Annotation\Route;
+use src\Service\FirebaseAuthService;
 
-class AuthController extends AbstractController
+class FirebaseAuthController1 extends AbstractController
 {
-    private $firebaseAuthService;
+    private $authService;
 
-    public function __construct(FirebaseAuthService $firebaseAuthService)
+    public function __construct(FirebaseAuthService $authService)
     {
-        $this->firebaseAuthService = $firebaseAuthService;
+        $this->authService = $authService;
     }
 
     /**
-     * @Route("/auth/inicio", name="auth_inicio", methods={"GET"})
+     * @Route("/register", name="register", methods={"POST"})
      */
-    public function saludo(): Response
+    public function register(Request $request): JsonResponse
     {
-        return new Response('Bienvenidos a Sharkstar');
+        $data = json_decode($request->getContent(), true);
+        $email = $data['email'];
+        $password = $data['password'];
+        $displayName = $data['displayName'] ?? null;
+
+        try {
+            $usuario = $this->authService->registerUser($email, $password, $displayName);
+            return new JsonResponse(['message' => 'User registered successfully', 'user' => $usuario->getId()]);
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => $e->getMessage()], 400);
+        }
     }
 
     /**
-     * @Route("/auth/signup", name="auth_signup", methods={"POST"})
+     * @Route("/login", name="login", methods={"POST"})
      */
-    public function signUp(Request $request): Response
+    public function login(Request $request): JsonResponse
     {
-        $email = $request->get('email');
-        $password = $request->get('password');
-        $displayName = $request->get('displayName');
+        $data = json_decode($request->getContent(), true);
+        $email = $data['email'];
+        $password = $data['password'];
 
-        return $this->firebaseAuthService->createUserAccount($email, $password, $displayName);
-    }
+        $usuario = $this->authService->loginUser($email, $password);
 
-    /**
-     * @Route("/auth/login", name="auth_login", methods={"POST"})
-     */
-    public function login(Request $request): Response
-    {
-        $email = $request->get('email');
-        $password = $request->get('password');
+        if ($usuario) {
+            return new JsonResponse(['message' => 'Login successful', 'user' => $usuario->getId()]);
+        }
 
-        return $this->firebaseAuthService->signInWithEmailAndPassword($email, $password);
-    }
-
-    /**
-     * @Route("/auth/verify", name="auth_verify", methods={"POST"})
-     */
-    public function verifyToken(Request $request): Response
-    {
-        $token = $request->get('token');
-        return $this->firebaseAuthService->verifyToken($token);
-    }
-
-    /**
-     * @Route("/auth/signinWithToken", name="auth_signinWithToken", methods={"POST"})
-     */
-    public function signInWithToken(Request $request): Response
-    {
-        $token = $request->get('token');
-        $userRecord = $this->firebaseAuthService->signIn($token);
-        return $userRecord ? new Response(json_encode($userRecord), 200) : new Response('Invalid token', 401);
+        return new JsonResponse(['error' => 'Invalid credentials'], 401);
     }
 }
-
-
-

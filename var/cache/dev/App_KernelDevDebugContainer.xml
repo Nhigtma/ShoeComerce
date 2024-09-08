@@ -377,17 +377,36 @@
       <tag name="controller.service_arguments"/>
       <tag name="routing.route_loader"/>
     </service>
+    <service id="Kreait\Firebase\Factory" class="Kreait\Firebase\Factory" autowire="true" autoconfigure="true">
+      <tag name="firebase"/>
+      <argument>C:\Proyecto\shoecomerce/config/firebase_credentials.json</argument>
+    </service>
     <service id="App\Entity" class="App\Entity" abstract="true">
       <tag name="container.excluded" source="in &quot;config/services.yaml&quot;"/>
     </service>
     <service id="App\Controller\FirebaseController" class="App\Controller\FirebaseController" autowire="true" autoconfigure="true">
       <tag name="container.error" message="The autoloader expected class &quot;App\Controller\FirebaseController&quot; to be defined in file &quot;C:\Proyecto\shoecomerce\vendor\composer/../../src\Controller\FirebaseController.php&quot;. The file was found but the class was not in it, the class name or namespace probably has a typo."/>
     </service>
-    <service id="App\Repository\UsuarioRepository" class="App\Repository\UsuarioRepository" autowire="true" autoconfigure="true">
-      <tag name="container.error" message="The autoloader expected class &quot;App\Repository\UsuarioRepository&quot; to be defined in file &quot;C:\Proyecto\shoecomerce\vendor\composer/../../src\Repository\UsuarioRepository.php&quot;. The file was found but the class was not in it, the class name or namespace probably has a typo."/>
+    <service id="App\Document\usuarios" class="App\Document\usuarios" autowire="true" autoconfigure="true">
+      <tag name="container.error" message="The autoloader expected class &quot;App\Document\usuarios&quot; to be defined in file &quot;C:\Proyecto\shoecomerce\vendor\composer/../../src\Document\usuarios.php&quot;. The file was found but the class was not in it, the class name or namespace probably has a typo."/>
     </service>
-    <service id="App\Service\FirebaseService" class="App\Service\FirebaseService" autowire="true" autoconfigure="true">
-      <tag name="container.error" message="The autoloader expected class &quot;App\Service\FirebaseService&quot; to be defined in file &quot;C:\Proyecto\shoecomerce\vendor\composer/../../src\Service\FirebaseService.php&quot;. The file was found but the class was not in it, the class name or namespace probably has a typo."/>
+    <service id="App\Repository\UsuariosRepository" class="App\Repository\UsuariosRepository" autowire="true" autoconfigure="true">
+      <tag name="container.error" message="The autoloader expected class &quot;App\Repository\UsuariosRepository&quot; to be defined in file &quot;C:\Proyecto\shoecomerce\vendor\composer/../../src\Repository\UsuariosRepository.php&quot;. The file was found but the class was not in it, the class name or namespace probably has a typo."/>
+    </service>
+    <service id="App\Service\FirebaseServices" class="App\Service\FirebaseServices" autowire="true" autoconfigure="true">
+      <tag name="container.error" message="The autoloader expected class &quot;App\Service\FirebaseServices&quot; to be defined in file &quot;C:\Proyecto\shoecomerce\vendor\composer/../../src\Service\FirebaseServices.php&quot;. The file was found but the class was not in it, the class name or namespace probably has a typo."/>
+    </service>
+    <service id="App\Services\Caja\index" class="App\Services\Caja\index" autowire="true" autoconfigure="true">
+      <tag name="container.error" message="The autoloader expected class &quot;App\Services\Caja\index&quot; to be defined in file &quot;C:\Proyecto\shoecomerce\vendor\composer/../../src\Services\Caja\index.php&quot;. The file was found but the class was not in it, the class name or namespace probably has a typo."/>
+    </service>
+    <service id="App\Services\Product\index" class="App\Services\Product\index" autowire="true" autoconfigure="true">
+      <tag name="container.error" message="The autoloader expected class &quot;App\Services\Product\index&quot; to be defined in file &quot;C:\Proyecto\shoecomerce\vendor\composer/../../src\Services\Product\index.php&quot;. The file was found but the class was not in it, the class name or namespace probably has a typo."/>
+    </service>
+    <service id="App\Services\User\index" class="App\Services\User\index" autowire="true" autoconfigure="true">
+      <tag name="container.error" message="The autoloader expected class &quot;App\Services\User\index&quot; to be defined in file &quot;C:\Proyecto\shoecomerce\vendor\composer/../../src\Services\User\index.php&quot;. The file was found but the class was not in it, the class name or namespace probably has a typo."/>
+    </service>
+    <service id="App\Services\Venta\index" class="App\Services\Venta\index" autowire="true" autoconfigure="true">
+      <tag name="container.error" message="The autoloader expected class &quot;App\Services\Venta\index&quot; to be defined in file &quot;C:\Proyecto\shoecomerce\vendor\composer/../../src\Services\Venta\index.php&quot;. The file was found but the class was not in it, the class name or namespace probably has a typo."/>
     </service>
     <service id="argument_metadata_factory" class="Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory"/>
     <service id="argument_resolver.backed_enum_resolver" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\BackedEnumValueResolver">

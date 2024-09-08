@@ -29,6 +29,7 @@ class EntityManagerConfig
     private $autoMapping;
     private $namingStrategy;
     private $quoteStrategy;
+    private $typedFieldMapper;
     private $entityListenerResolver;
     private $repositoryFactory;
     private $schemaIgnoreClasses;
@@ -39,6 +40,7 @@ class EntityManagerConfig
     private $mappings;
     private $dql;
     private $filters;
+    private $identityGenerationPreferences;
     private $_usedProperties = [];
 
     /**
@@ -222,6 +224,19 @@ class EntityManagerConfig
     }
 
     /**
+     * @default 'doctrine.orm.typed_field_mapper.default'
+     * @param ParamConfigurator|mixed $value
+     * @return $this
+     */
+    public function typedFieldMapper($value): static
+    {
+        $this->_usedProperties['typedFieldMapper'] = true;
+        $this->typedFieldMapper = $value;
+
+        return $this;
+    }
+
+    /**
      * @default null
      * @param ParamConfigurator|mixed $value
      * @return $this
@@ -374,6 +389,17 @@ class EntityManagerConfig
         return $this->filters[$name];
     }
 
+    /**
+     * @return $this
+     */
+    public function identityGenerationPreference(string $platform, mixed $value): static
+    {
+        $this->_usedProperties['identityGenerationPreferences'] = true;
+        $this->identityGenerationPreferences[$platform] = $value;
+
+        return $this;
+    }
+
     public function __construct(array $value = [])
     {
         if (array_key_exists('query_cache_driver', $value)) {
@@ -436,6 +462,12 @@ class EntityManagerConfig
             unset($value['quote_strategy']);
         }
 
+        if (array_key_exists('typed_field_mapper', $value)) {
+            $this->_usedProperties['typedFieldMapper'] = true;
+            $this->typedFieldMapper = $value['typed_field_mapper'];
+            unset($value['typed_field_mapper']);
+        }
+
         if (array_key_exists('entity_listener_resolver', $value)) {
             $this->_usedProperties['entityListenerResolver'] = true;
             $this->entityListenerResolver = $value['entity_listener_resolver'];
@@ -496,6 +528,12 @@ class EntityManagerConfig
             unset($value['filters']);
         }
 
+        if (array_key_exists('identity_generation_preferences', $value)) {
+            $this->_usedProperties['identityGenerationPreferences'] = true;
+            $this->identityGenerationPreferences = $value['identity_generation_preferences'];
+            unset($value['identity_generation_preferences']);
+        }
+
         if ([] !== $value) {
             throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($value)));
         }
@@ -534,6 +572,9 @@ class EntityManagerConfig
         if (isset($this->_usedProperties['quoteStrategy'])) {
             $output['quote_strategy'] = $this->quoteStrategy;
         }
+        if (isset($this->_usedProperties['typedFieldMapper'])) {
+            $output['typed_field_mapper'] = $this->typedFieldMapper;
+        }
         if (isset($this->_usedProperties['entityListenerResolver'])) {
             $output['entity_listener_resolver'] = $this->entityListenerResolver;
         }
@@ -563,6 +604,9 @@ class EntityManagerConfig
         }
         if (isset($this->_usedProperties['filters'])) {
             $output['filters'] = array_map(fn ($v) => $v instanceof \Symfony\Config\Doctrine\Orm\EntityManagerConfig\FilterConfig ? $v->toArray() : $v, $this->filters);
+        }
+        if (isset($this->_usedProperties['identityGenerationPreferences'])) {
+            $output['identity_generation_preferences'] = $this->identityGenerationPreferences;
         }
 
         return $output;

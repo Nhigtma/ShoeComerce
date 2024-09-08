@@ -8,6 +8,11 @@ parameters:
     env(MONGODB_DB): 'proyecto'
 
 services:
+    Kreait\Firebase\Factory:
+        arguments:
+            - '%kernel.project_dir%/config/firebase_credentials.json'
+        tags: ['firebase']
+
     # default configuration for services in *this* file
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.

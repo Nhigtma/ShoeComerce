@@ -406,6 +406,6 @@ class __TwigTemplate_ef3cccd9b6ea0762b7735622a6b91766 extends Template
         </tbody>
     </table>
 {% endblock %}
-", "@DoctrineMongoDB/Collector/mongodb.html.twig", "C:\\shoecomerce\\vendor\\doctrine\\mongodb-odm-bundle\\templates\\Collector\\mongodb.html.twig");
+", "@DoctrineMongoDB/Collector/mongodb.html.twig", "C:\\Proyecto\\shoecomerce\\vendor\\doctrine\\mongodb-odm-bundle\\templates\\Collector\\mongodb.html.twig");
     }
 }
