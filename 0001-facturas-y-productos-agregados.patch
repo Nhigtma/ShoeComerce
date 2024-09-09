@@ -1,0 +1,699 @@
+From 5aee305a691c6b63a9220684273bd052354dc70d Mon Sep 17 00:00:00 2001
+From: laura2322 <mariabejarano006@gmail.com>
+Date: Sun, 8 Sep 2024 19:39:33 -0500
+Subject: [PATCH] facturas y productos agregados
+
+---
+ src/Controller/FacturaController.php  |  57 +++++++++++++
+ src/Controller/ProductoController.php |  85 ++++++++++++++++++++
+ src/Entity/Factura.php                | 110 ++++++++++++++++++++++++++
+ src/Entity/Producto.php               |  90 +++++++++++++++++++++
+ src/Service/FacturaService.php        |  53 +++++++++++++
+ src/Service/ProductoService.php       |  47 +++++++++++
+ src/Service/UsuarioService.php        |   5 ++
+ templates/facturas/lista.html.twig    |  38 +++++++++
+ templates/producto/detalle.html.twig  |  18 +++++
+ templates/producto/listar.html.twig   |  45 +++++++++++
+ templates/producto/nuevo.html.twig    |  35 ++++++++
+ 11 files changed, 583 insertions(+)
+ create mode 100644 src/Controller/FacturaController.php
+ create mode 100644 src/Controller/ProductoController.php
+ create mode 100644 src/Entity/Factura.php
+ create mode 100644 src/Entity/Producto.php
+ create mode 100644 src/Service/FacturaService.php
+ create mode 100644 src/Service/ProductoService.php
+ create mode 100644 templates/facturas/lista.html.twig
+ create mode 100644 templates/producto/detalle.html.twig
+ create mode 100644 templates/producto/listar.html.twig
+ create mode 100644 templates/producto/nuevo.html.twig
+
+diff --git a/src/Controller/FacturaController.php b/src/Controller/FacturaController.php
+new file mode 100644
+index 0000000..d3d7d48
+--- /dev/null
++++ b/src/Controller/FacturaController.php
+@@ -0,0 +1,57 @@
++<?php
++
++namespace App\Controller;
++
++use App\Service\FacturaService;
++use App\Service\UsuarioService;
++use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
++use Symfony\Component\HttpFoundation\Request;
++use Symfony\Component\HttpFoundation\Response;
++use Symfony\Component\Routing\Annotation\Route;
++
++class FacturaController extends AbstractController
++{
++    private $facturaService;
++    private $usuarioService;
++    
++    public function __construct(FacturaService $facturaService, UsuarioService $usuarioService)
++    {
++        $this->facturaService = $facturaService;
++        $this->usuarioService= $usuarioService;
++    }
++
++    /**
++     * @Route("/facturas", name="listar_facturas", methods={"GET"})
++     */
++    public function listarFacturas(): Response
++    {
++        $facturas = $this->facturaService->obtenerTodasLasFacturas();
++
++        return $this->render('factura/listar.html.twig', [
++            'facturas' => $facturas,
++        ]);
++    }
++
++    /**
++     * @Route("/facturas/nueva", name="nueva_factura", methods={"POST"})
++     */
++    public function crearFactura(Request $request): Response
++    {
++        $usuarioId = $request->get('usuario_id');
++        $productosIds = $request->get('productos_ids');
++        $tipoDePago = $request->get('tipo_de_pago');
++        $total = $request->get('total');
++
++        // Obtener el usuario (puedes modificar esto según tu lógica)
++        $usuario =$this->usuarioService->obtenerUsuarioPorId($usuarioId);
++
++        if (!$usuario) {
++            return new Response('Usuario no encontrado', Response::HTTP_NOT_FOUND);
++        }
++
++        // Crear la factura usando el servicio
++        $factura = $this->facturaService->crearFactura($usuario, $productosIds, $tipoDePago, $total);
++
++        return new Response('Factura creada con éxito', Response::HTTP_CREATED);
++    }
++}
+\ No newline at end of file
+diff --git a/src/Controller/ProductoController.php b/src/Controller/ProductoController.php
+new file mode 100644
+index 0000000..1bd44b3
+--- /dev/null
++++ b/src/Controller/ProductoController.php
+@@ -0,0 +1,85 @@
++<?php
++
++namespace App\Controller;
++
++use App\Entity\Producto;
++use App\Service\ProductoService;
++use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
++use Symfony\Component\HttpFoundation\Request;
++use Symfony\Component\HttpFoundation\Response;
++use Symfony\Component\Routing\Annotation\Route;
++
++class ProductoController extends AbstractController
++{
++    private $productoService;
++
++    public function __construct(ProductoService $productoService)
++    {
++        $this->productoService = $productoService;
++    }
++
++    /**
++     * @Route("/productos", name="listar_productos", methods={"GET"})
++     */
++    public function listarProductos(): Response
++    {
++        $productos = $this->productoService->obtenerTodosLosProductos();
++
++        return $this->render('producto/listar.html.twig', [
++            'productos' => $productos,
++        ]);
++    }
++
++    /**
++     * @Route("/productos/nuevo", name="nuevo_producto", methods={"GET", "POST"})
++     */
++    public function crearProducto(Request $request): Response
++    {
++        if ($request->isMethod('POST')) {
++            $nombre = $request->get('nombre');
++            $precio = $request->get('precio');
++            $marca = $request->get('marca');
++            $cantidad = $request->get('cantidad');
++            $descripcion = $request->get('descripcion');
++
++            // Crear el nuevo producto usando el servicio
++            $producto = $this->productoService->crearProducto($nombre, $precio, $marca, $cantidad, $descripcion);
++
++            return $this->redirectToRoute('listar_productos');
++        }
++
++        return $this->render('producto/nuevo.html.twig');
++    }
++
++    /**
++     * @Route("/productos/{id}", name="detalle_producto", methods={"GET"})
++     */
++    public function detalleProducto(int $id): Response
++    {
++        $producto = $this->productoService->obtenerProductoPorId($id);
++
++        if (!$producto) {
++            throw $this->createNotFoundException('El producto no existe');
++        }
++
++        return $this->render('producto/detalle.html.twig', [
++            'producto' => $producto,
++        ]);
++    }
++
++    /**
++     * @Route("/productos/{id}/eliminar", name="eliminar_producto", methods={"POST"})
++     */
++    public function eliminarProducto(int $id): Response
++    {
++        $producto = $this->productoService->obtenerProductoPorId($id);
++
++        if (!$producto) {
++            throw $this->createNotFoundException('El producto no existe');
++        }
++
++        $this->productoService->eliminarProducto($producto);
++
++        return $this->redirectToRoute('listar_productos');
++    }
++}
+\ No newline at end of file
+diff --git a/src/Entity/Factura.php b/src/Entity/Factura.php
+new file mode 100644
+index 0000000..7f6b676
+--- /dev/null
++++ b/src/Entity/Factura.php
+@@ -0,0 +1,110 @@
++<?php
++namespace App\Entity;
++
++use Doctrine\ORM\Mapping as ORM;
++use Doctrine\Common\Collections\ArrayCollection;
++use Doctrine\Common\Collections\Collection;
++
++#[ORM\Entity]
++class Factura
++{
++    #[ORM\Id]
++    #[ORM\GeneratedValue]
++    #[ORM\Column(type: 'integer')]
++    private $id;
++
++    #[ORM\ManyToOne(targetEntity: Usuario::class)]
++    #[ORM\JoinColumn(nullable: false)]
++    private $usuario;
++
++    #[ORM\ManyToMany(targetEntity: $productos::class)]
++    #[ORM\JoinTable(name: "facturas_productos")]
++    private $productos;
++
++    #[ORM\Column(type: 'string', length: 50)]
++    private $tipoDePago;
++
++    #[ORM\Column(type: 'decimal', precision: 10, scale: 2)]
++    private $total;
++
++    #[ORM\Column(type: 'datetime')]
++    private $fecha;
++
++    public function __construct()
++    {
++        $this->productos = new ArrayCollection();
++    }
++
++    // Getters y setters
++
++    public function getId(): ?int
++    {
++        return $this->id;
++    }
++
++    public function getUsuario(): ?Usuario
++    {
++        return $this->usuario;
++    }
++
++    public function setUsuario(?Usuario $usuario): self
++    {
++        $this->usuario = $usuario;
++        return $this;
++    }
++
++    /**
++     * @return Collection|Producto[]
++     */
++    public function getProductos(): Collection
++    {
++        return $this->productos;
++    }
++
++    public function addProducto(Producto $producto): self
++    {
++        if (!$this->productos->contains($producto)) {
++            $this->productos[] = $producto;
++        }
++        return $this;
++    }
++
++    public function removeProducto(Producto $producto): self
++    {
++        $this->productos->removeElement($producto);
++        return $this;
++    }
++
++    public function getTipoDePago(): ?string
++    {
++        return $this->tipoDePago;
++    }
++
++    public function setTipoDePago(string $tipoDePago): self
++    {
++        $this->tipoDePago = $tipoDePago;
++        return $this;
++    }
++
++    public function getTotal(): ?string
++    {
++        return $this->total;
++    }
++
++    public function setTotal(string $total): self
++    {
++        $this->total = $total;
++        return $this;
++    }
++
++    public function getFecha(): ?\DateTimeInterface
++    {
++        return $this->fecha;
++    }
++
++    public function setFecha(\DateTimeInterface $fecha): self
++    {
++        $this->fecha = $fecha;
++        return $this;
++    }
++}
+\ No newline at end of file
+diff --git a/src/Entity/Producto.php b/src/Entity/Producto.php
+new file mode 100644
+index 0000000..c29aece
+--- /dev/null
++++ b/src/Entity/Producto.php
+@@ -0,0 +1,90 @@
++<?php
++namespace App\Entity;
++
++use Doctrine\ORM\Mapping as ORM;
++
++#[ORM\Entity]
++class Producto
++{
++    #[ORM\Id]
++    #[ORM\GeneratedValue]
++    #[ORM\Column(type: 'integer')]
++    private $id;
++
++    #[ORM\Column(type: 'string', length: 100)]
++    private $nombre;
++
++    #[ORM\Column(type: 'decimal', precision: 10, scale: 2)]
++    private $precio;
++
++    #[ORM\Column(type: 'string', length: 100)]
++    private $marca;
++
++    #[ORM\Column(type: 'integer')]
++    private $cantidad;
++
++    #[ORM\Column(type: 'text')]
++    private $descripcion;
++
++    // Getters y setters
++
++    public function getId(): ?int
++    {
++        return $this->id;
++    }
++
++    public function getNombre(): ?string
++    {
++        return $this->nombre;
++    }
++
++    public function setNombre(string $nombre): self
++    {
++        $this->nombre = $nombre;
++        return $this;
++    }
++
++    public function getPrecio(): ?string
++    {
++        return $this->precio;
++    }
++
++    public function setPrecio(string $precio): self
++    {
++        $this->precio = $precio;
++        return $this;
++    }
++
++    public function getMarca(): ?string
++    {
++        return $this->marca;
++    }
++
++    public function setMarca(string $marca): self
++    {
++        $this->marca = $marca;
++        return $this;
++    }
++
++    public function getCantidad(): ?int
++    {
++        return $this->cantidad;
++    }
++
++    public function setCantidad(int $cantidad): self
++    {
++        $this->cantidad = $cantidad;
++        return $this;
++    }
++
++    public function getDescripcion(): ?string
++    {
++        return $this->descripcion;
++    }
++
++    public function setDescripcion(string $descripcion): self
++    {
++        $this->descripcion = $descripcion;
++        return $this;
++    }
++}
+\ No newline at end of file
+diff --git a/src/Service/FacturaService.php b/src/Service/FacturaService.php
+new file mode 100644
+index 0000000..37e1871
+--- /dev/null
++++ b/src/Service/FacturaService.php
+@@ -0,0 +1,53 @@
++<?php
++
++// src/Service/FacturaService.php
++namespace App\Service;
++
++use App\Entity\Factura;
++use App\Entity\Usuario;
++use Doctrine\ORM\EntityManagerInterface;
++use App\Service\ProductoService;
++
++class FacturaService
++{
++    private $entityManager;
++    private $productoService;
++
++    public function __construct(EntityManagerInterface $entityManager, ProductoService $productoService)
++    {
++        $this->entityManager = $entityManager;
++        $this->productoService = $productoService;
++    }
++
++    public function crearFactura(Usuario $usuario, array $productosIds, string $tipoDePago, float $total): Factura
++    {
++        $factura = new Factura();
++        $factura->setUsuario($usuario);
++        $factura->setTipoDePago($tipoDePago);
++        $factura->setTotal($total);
++        $factura->setFecha(new \DateTime());
++
++        // Agregar productos a la factura
++        foreach ($productosIds as $productoId) {
++            $producto = $this->productoService->obtenerProductoPorId($productoId);
++            if ($producto) {
++                $factura->addProducto($producto);
++            }
++        }
++
++        $this->entityManager->persist($factura);
++        $this->entityManager->flush();
++
++        return $factura;
++    }
++
++    public function obtenerFacturaPorId(int $id): ?Factura
++    {
++        return $this->entityManager->getRepository(Factura::class)->find($id);
++
++    }
++    public function obtenerTodasLasFacturas(): array
++    {
++        return $this->entityManager->getRepository(Factura::class)->findAll();
++    }
++}
+diff --git a/src/Service/ProductoService.php b/src/Service/ProductoService.php
+new file mode 100644
+index 0000000..d7773a9
+--- /dev/null
++++ b/src/Service/ProductoService.php
+@@ -0,0 +1,47 @@
++<?php
++
++namespace App\Service;
++
++use App\Entity\Producto;
++use Doctrine\ORM\EntityManagerInterface;
++
++class ProductoService
++{
++    private $entityManager;
++
++    public function __construct(EntityManagerInterface $entityManager)
++    {
++        $this->entityManager = $entityManager;
++    }
++
++    public function obtenerTodosLosProductos(): array
++    {
++        return $this->entityManager->getRepository(Producto::class)->findAll();
++    }
++
++    public function obtenerProductoPorId(int $id): ?Producto
++    {
++        return $this->entityManager->getRepository(Producto::class)->find($id);
++    }
++
++    public function crearProducto(string $nombre, float $precio, string $marca, int $cantidad, string $descripcion): Producto
++    {
++        $producto = new Producto();
++        $producto->setNombre($nombre)
++            ->setPrecio($precio)
++            ->setMarca($marca)
++            ->setCantidad($cantidad)
++            ->setDescripcion($descripcion);
++
++        $this->entityManager->persist($producto);
++        $this->entityManager->flush();
++
++        return $producto;
++    }
++
++    public function eliminarProducto(Producto $producto): void
++    {
++        $this->entityManager->remove($producto);
++        $this->entityManager->flush();
++    }
++}
+diff --git a/src/Service/UsuarioService.php b/src/Service/UsuarioService.php
+index 6649fc6..1b24bec 100644
+--- a/src/Service/UsuarioService.php
++++ b/src/Service/UsuarioService.php
+@@ -14,6 +14,10 @@ class UsuarioService
+         $this->documentManager = $documentManager;
+     }
+ 
++    public function obtenerUsuarioPorId(int $id): ?Usuario
++    {
++        return $this->documentManager->getRepository(Usuario::class)->find($id);
++    }
+     public function listarUsuarios()
+     {
+         return $this->documentManager->getRepository(Usuario::class)->findAll();
+@@ -33,4 +37,5 @@ class UsuarioService
+         $this->documentManager->persist($usuario);
+         $this->documentManager->flush();
+     }
++
+ }
+diff --git a/templates/facturas/lista.html.twig b/templates/facturas/lista.html.twig
+new file mode 100644
+index 0000000..ffb8b0b
+--- /dev/null
++++ b/templates/facturas/lista.html.twig
+@@ -0,0 +1,38 @@
++{% extends 'base.html.twig' %}
++
++{% block title %}Lista de Facturas{% endblock %}
++
++{% block body %}
++    <h1>Lista de Facturas</h1>
++
++    {% if facturas is empty %}
++        <p>No hay facturas disponibles.</p>
++    {% else %}
++        <table>
++            <thead>
++                <tr>
++                    <th>ID</th>
++                    <th>Usuario</th>
++                    <th>Total</th>
++                    <th>Tipo de Pago</th>
++                    <th>Fecha</th>
++                    <th>Acciones</th>
++                </tr>
++            </thead>
++            <tbody>
++                {% for factura in facturas %}
++                    <tr>
++                        <td>{{ factura.id }}</td>
++                        <td>{{ factura.usuario.nombre }}</td>
++                        <td>{{ factura.total }}</td>
++                        <td>{{ factura.tipoDePago }}</td>
++                        <td>{{ factura.fecha|date('d/m/Y H:i') }}</td>
++                        <td>
++                            <a href="{{ path('detalle_factura', { id: factura.id }) }}">Ver Detalles</a>
++                        </td>
++                    </tr>
++                {% endfor %}
++            </tbody>
++        </table>
++    {% endif %}
++{% endblock %}
+\ No newline at end of file
+diff --git a/templates/producto/detalle.html.twig b/templates/producto/detalle.html.twig
+new file mode 100644
+index 0000000..b2463fc
+--- /dev/null
++++ b/templates/producto/detalle.html.twig
+@@ -0,0 +1,18 @@
++{% extends 'base.html.twig' %}
++
++{% block title %}Detalles del Producto{% endblock %}
++
++{% block body %}
++    <h1>Detalles del Producto</h1>
++
++    <ul>
++        <li><strong>ID:</strong> {{ producto.id }}</li>
++        <li><strong>Nombre:</strong> {{ producto.nombre }}</li>
++        <li><strong>Precio:</strong> {{ producto.precio }}</li>
++        <li><strong>Marca:</strong> {{ producto.marca }}</li>
++        <li><strong>Cantidad:</strong> {{ producto.cantidad }}</li>
++        <li><strong>Descripción:</strong> {{ producto.descripcion }}</li>
++    </ul>
++
++    <a href="{{ path('listar_productos') }}">Volver a la lista de productos</a>
++{% endblock %}
+\ No newline at end of file
+diff --git a/templates/producto/listar.html.twig b/templates/producto/listar.html.twig
+new file mode 100644
+index 0000000..fa103cd
+--- /dev/null
++++ b/templates/producto/listar.html.twig
+@@ -0,0 +1,45 @@
++{% extends 'base.html.twig' %}
++
++{% block title %}Lista de Productos{% endblock %}
++
++{% block body %}
++    <h1>Lista de Productos</h1>
++
++    {% if productos is empty %}
++        <p>No hay productos disponibles.</p>
++    {% else %}
++        <table>
++            <thead>
++                <tr>
++                    <th>ID</th>
++                    <th>Nombre</th>
++                    <th>Precio</th>
++                    <th>Marca</th>
++                    <th>Cantidad</th>
++                    <th>Descripción</th>
++                    <th>Acciones</th>
++                </tr>
++            </thead>
++            <tbody>
++                {% for producto in productos %}
++                    <tr>
++                        <td>{{ producto.id }}</td>
++                        <td>{{ producto.nombre }}</td>
++                        <td>{{ producto.precio }}</td>
++                        <td>{{ producto.marca }}</td>
++                        <td>{{ producto.cantidad }}</td>
++                        <td>{{ producto.descripcion }}</td>
++                        <td>
++                            <a href="{{ path('detalle_producto', { id: producto.id }) }}">Ver Detalles</a>
++                            <form action="{{ path('eliminar_producto', { id: producto.id }) }}" method="POST" style="display: inline;">
++                                <button type="submit">Eliminar</button>
++                            </form>
++                        </td>
++                    </tr>
++                {% endfor %}
++            </tbody>
++        </table>
++    {% endif %}
++
++    <a href="{{ path('nuevo_producto') }}">Agregar nuevo producto</a>
++{% endblock %}
+\ No newline at end of file
+diff --git a/templates/producto/nuevo.html.twig b/templates/producto/nuevo.html.twig
+new file mode 100644
+index 0000000..2bbcf46
+--- /dev/null
++++ b/templates/producto/nuevo.html.twig
+@@ -0,0 +1,35 @@
++{% extends 'base.html.twig' %}
++
++{% block title %}Nuevo Producto{% endblock %}
++
++{% block body %}
++    <h1>Nuevo Producto</h1>
++
++    <form action="{{ path('nuevo_producto') }}" method="POST">
++        <div>
++            <label for="nombre">Nombre:</label>
++            <input type="text" id="nombre" name="nombre" required>
++        </div>
++        <div>
++            <label for="precio">Precio:</label>
++            <input type="number" id="precio" name="precio" step="0.01" required>
++        </div>
++        <div>
++            <label for="marca">Marca:</label>
++            <input type="text" id="marca" name="marca" required>
++        </div>
++        <div>
++            <label for="cantidad">Cantidad:</label>
++            <input type="number" id="cantidad" name="cantidad" required>
++        </div>
++        <div>
++            <label for="descripcion">Descripción:</label>
++            <textarea id="descripcion" name="descripcion" required></textarea>
++        </div>
++        <div>
++            <button type="submit">Crear Producto</button>
++        </div>
++    </form>
++
++    <a href="{{ path('listar_productos') }}">Volver a la lista de productos</a>
++{% endblock %}
+\ No newline at end of file
+-- 
+2.44.0.windows.1
+
