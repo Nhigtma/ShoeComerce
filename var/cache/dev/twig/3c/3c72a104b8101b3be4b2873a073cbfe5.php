@@ -225,6 +225,6 @@ class __TwigTemplate_0b447e5abc076466b2ab99a21aa5e0c6 extends Template
         {% block body %}{% endblock %}
     </body>
 </html>
-", "base.html.twig", "C:\\Proyecto\\shoecomerce\\templates\\base.html.twig");
+", "base.html.twig", "C:\\Proyecto\\ShoeComerce\\templates\\base.html.twig");
     }
 }

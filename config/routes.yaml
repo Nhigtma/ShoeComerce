@@ -1,5 +1,9 @@
-controllers:
-    resource:
-        path: ../src/Controller/
-        namespace: App\Controller
-    type: attribute
+csv_ordenar:
+    path: /csv/ordenar/{filename}/{posicion}
+    controller: App\Controller\LecturaCsvController::ordenar
+    methods: [GET]
+
+csv_ordenar_burbuja:
+    path: /csv/ordenar-burbuja/{filename}/{posicion}
+    controller: App\Controller\LecturaCsvController::ordenarBurbuja
+    methods: [GET]
