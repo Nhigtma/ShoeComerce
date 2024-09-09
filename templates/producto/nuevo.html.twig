@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nuevo Producto{% endblock %}
+
+{% block body %}
+    <h1>Nuevo Producto</h1>
+
+    <form action="{{ path('nuevo_producto') }}" method="POST">
+        <div>
+            <label for="nombre">Nombre:</label>
+            <input type="text" id="nombre" name="nombre" required>
+        </div>
+        <div>
+            <label for="precio">Precio:</label>
+            <input type="number" id="precio" name="precio" step="0.01" required>
+        </div>
+        <div>
+            <label for="marca">Marca:</label>
+            <input type="text" id="marca" name="marca" required>
+        </div>
+        <div>
+            <label for="cantidad">Cantidad:</label>
+            <input type="number" id="cantidad" name="cantidad" required>
+        </div>
+        <div>
+            <label for="descripcion">Descripción:</label>
+            <textarea id="descripcion" name="descripcion" required></textarea>
+        </div>
+        <div>
+            <button type="submit">Crear Producto</button>
+        </div>
+    </form>
+
+    <a href="{{ path('listar_productos') }}">Volver a la lista de productos</a>
+{% endblock %}

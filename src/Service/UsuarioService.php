@@ -14,6 +14,10 @@ class UsuarioService
         $this->documentManager = $documentManager;
     }
 
+    public function obtenerUsuarioPorId(int $id): ?Usuario
+    {
+        return $this->documentManager->getRepository(Usuario::class)->find($id);
+    }
     public function listarUsuarios()
     {
         return $this->documentManager->getRepository(Usuario::class)->findAll();
@@ -33,4 +37,5 @@ class UsuarioService
         $this->documentManager->persist($usuario);
         $this->documentManager->flush();
     }
+
 }

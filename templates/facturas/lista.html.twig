@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Lista de Facturas{% endblock %}
+
+{% block body %}
+    <h1>Lista de Facturas</h1>
+
+    {% if facturas is empty %}
+        <p>No hay facturas disponibles.</p>
+    {% else %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Usuario</th>
+                    <th>Total</th>
+                    <th>Tipo de Pago</th>
+                    <th>Fecha</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for factura in facturas %}
+                    <tr>
+                        <td>{{ factura.id }}</td>
+                        <td>{{ factura.usuario.nombre }}</td>
+                        <td>{{ factura.total }}</td>
+                        <td>{{ factura.tipoDePago }}</td>
+                        <td>{{ factura.fecha|date('d/m/Y H:i') }}</td>
+                        <td>
+                            <a href="{{ path('detalle_factura', { id: factura.id }) }}">Ver Detalles</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+{% endblock %}
