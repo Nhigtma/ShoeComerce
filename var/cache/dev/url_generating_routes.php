@@ -19,4 +19,6 @@ return [
     '_profiler_exception_css' => [['token'], ['_controller' => 'web_profiler.controller.exception_panel::stylesheet'], [], [['text', '/exception.css'], ['variable', '/', '[^/]++', 'token', true], ['text', '/_profiler']], [], [], []],
     'csv_ordenar' => [['filename', 'posicion'], ['_controller' => 'App\\Controller\\LecturaCsvController::ordenar'], [], [['variable', '/', '[^/]++', 'posicion', true], ['variable', '/', '[^/]++', 'filename', true], ['text', '/csv/ordenar']], [], [], []],
     'csv_ordenar_burbuja' => [['filename', 'posicion'], ['_controller' => 'App\\Controller\\LecturaCsvController::ordenarBurbuja'], [], [['variable', '/', '[^/]++', 'posicion', true], ['variable', '/', '[^/]++', 'filename', true], ['text', '/csv/ordenar-burbuja']], [], [], []],
+    'facturas_listar' => [[], ['_controller' => 'App\\Controller\\FacturaController::listarFacturas'], [], [['text', '/facturas']], [], [], []],
+    'facturas_nueva' => [[], ['_controller' => 'App\\Controller\\FacturaController::crearFactura'], [], [['text', '/facturas/nueva']], [], [], []],
 ];

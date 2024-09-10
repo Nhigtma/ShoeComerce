@@ -7,3 +7,13 @@ csv_ordenar_burbuja:
     path: /csv/ordenar-burbuja/{filename}/{posicion}
     controller: App\Controller\LecturaCsvController::ordenarBurbuja
     methods: [GET]
+
+facturas_listar:
+    path: /facturas
+    controller: App\Controller\FacturaController::listarFacturas
+    methods: GET
+
+facturas_nueva:
+    path: /facturas/nueva
+    controller: App\Controller\FacturaController::crearFactura
+    methods: POST

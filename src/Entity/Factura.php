@@ -17,7 +17,7 @@ class Factura
     #[ORM\JoinColumn(nullable: false)]
     private $usuario;
 
-    #[ORM\ManyToMany(targetEntity: $productos::class)]
+    #[ORM\ManyToMany(targetEntity: Producto::class)]
     #[ORM\JoinTable(name: "facturas_productos")]
     private $productos;
 
