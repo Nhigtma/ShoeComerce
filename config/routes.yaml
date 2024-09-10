@@ -17,3 +17,33 @@ facturas_nueva:
     path: /facturas/nueva
     controller: App\Controller\FacturaController::crearFactura
     methods: POST
+
+usuarios_nuevo:
+    path: /usuarios/nuevo
+    controller: App\Controller\UsuarioController::nuevo
+    methods: POST
+
+usuario_lista:
+    path: /usuarios
+    controller: App\Controller\UsuarioController::lista
+    methods: GET
+
+listar_productos:
+    path: /productos
+    controller: App\Controller\ProductoController::listarProductos
+    methods: GET
+
+nuevo_producto:
+    path: /productos/nuevo
+    controller: App\Controller\ProductoController::crearProducto
+    methods: POST
+
+detalle_producto:
+    path: /productos/{id}
+    controller: App\Controller\ProductoController::detalleProducto
+    methods: GET
+
+eliminar_producto:
+    path: /productos/{id}/eliminar
+    controller: App\Controller\ProductoController::eliminarProducto
+    methods: DELETE

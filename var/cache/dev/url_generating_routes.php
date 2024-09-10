@@ -21,4 +21,10 @@ return [
     'csv_ordenar_burbuja' => [['filename', 'posicion'], ['_controller' => 'App\\Controller\\LecturaCsvController::ordenarBurbuja'], [], [['variable', '/', '[^/]++', 'posicion', true], ['variable', '/', '[^/]++', 'filename', true], ['text', '/csv/ordenar-burbuja']], [], [], []],
     'facturas_listar' => [[], ['_controller' => 'App\\Controller\\FacturaController::listarFacturas'], [], [['text', '/facturas']], [], [], []],
     'facturas_nueva' => [[], ['_controller' => 'App\\Controller\\FacturaController::crearFactura'], [], [['text', '/facturas/nueva']], [], [], []],
+    'usuarios_nuevo' => [[], ['_controller' => 'App\\Controller\\UsuarioController::nuevo'], [], [['text', '/usuarios/nuevo']], [], [], []],
+    'usuario_lista' => [[], ['_controller' => 'App\\Controller\\UsuarioController::lista'], [], [['text', '/usuarios']], [], [], []],
+    'listar_productos' => [[], ['_controller' => 'App\\Controller\\ProductoController::listarProductos'], [], [['text', '/productos']], [], [], []],
+    'nuevo_producto' => [[], ['_controller' => 'App\\Controller\\ProductoController::crearProducto'], [], [['text', '/productos/nuevo']], [], [], []],
+    'detalle_producto' => [['id'], ['_controller' => 'App\\Controller\\ProductoController::detalleProducto'], [], [['variable', '/', '[^/]++', 'id', true], ['text', '/productos']], [], [], []],
+    'eliminar_producto' => [['id'], ['_controller' => 'App\\Controller\\ProductoController::eliminarProducto'], [], [['text', '/eliminar'], ['variable', '/', '[^/]++', 'id', true], ['text', '/productos']], [], [], []],
 ];

@@ -2,9 +2,9 @@
 
 namespace App\Controller;
 
-
 use App\Service\ProductoService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -21,65 +21,65 @@ class ProductoController extends AbstractController
     /**
      * @Route("/productos", name="listar_productos", methods={"GET"})
      */
-    public function listarProductos(): Response
+    public function listarProductos(): JsonResponse
     {
         $productos = $this->productoService->obtenerTodosLosProductos();
 
-        return $this->render('producto/listar.html.twig', [
-            'productos' => $productos,
-        ]);
+        return new JsonResponse($productos, Response::HTTP_OK);
     }
 
     /**
-     * @Route("/productos/nuevo", name="nuevo_producto", methods={"GET", "POST"})
+     * @Route("/productos/nuevo", name="nuevo_producto", methods={"POST"})
      */
-    public function crearProducto(Request $request): Response
+    public function crearProducto(Request $request): JsonResponse
     {
-        if ($request->isMethod('POST')) {
-            $nombre = $request->get('nombre');
-            $precio = $request->get('precio');
-            $marca = $request->get('marca');
-            $cantidad = $request->get('cantidad');
-            $descripcion = $request->get('descripcion');
+        // Decodificar el contenido JSON
+        $data = json_decode($request->getContent(), true);
 
-            // Crear el nuevo producto usando el servicio
-            $producto = $this->productoService->crearProducto($nombre, $precio, $marca, $cantidad, $descripcion);
-
-            return $this->redirectToRoute('listar_productos');
+        // Validar si el JSON tiene los campos requeridos
+        if (!isset($data['nombre'], $data['precio'], $data['marca'], $data['cantidad'], $data['descripcion'])) {
+            return new JsonResponse(['error' => 'Faltan campos requeridos'], Response::HTTP_BAD_REQUEST);
         }
 
-        return $this->render('producto/nuevo.html.twig');
+        // Crear el nuevo producto usando el servicio
+        $producto = $this->productoService->crearProducto(
+            $data['nombre'],
+            (float) $data['precio'],
+            $data['marca'],
+            (int) $data['cantidad'],
+            $data['descripcion']
+        );
+
+        return new JsonResponse(['message' => 'Producto creado con éxito', 'producto' => $producto], Response::HTTP_CREATED);
     }
 
     /**
      * @Route("/productos/{id}", name="detalle_producto", methods={"GET"})
      */
-    public function detalleProducto(int $id): Response
+    public function detalleProducto(string $id): JsonResponse
     {
         $producto = $this->productoService->obtenerProductoPorId($id);
 
         if (!$producto) {
-            throw $this->createNotFoundException('El producto no existe');
+            return new JsonResponse(['error' => 'Producto no encontrado'], Response::HTTP_NOT_FOUND);
         }
 
-        return $this->render('producto/detalle.html.twig', [
-            'producto' => $producto,
-        ]);
+        return new JsonResponse($producto, Response::HTTP_OK);
     }
 
     /**
-     * @Route("/productos/{id}/eliminar", name="eliminar_producto", methods={"POST"})
+     * @Route("/productos/{id}/eliminar", name="eliminar_producto", methods={"DELETE"})
      */
-    public function eliminarProducto(int $id): Response
+    public function eliminarProducto(string $id): JsonResponse
     {
         $producto = $this->productoService->obtenerProductoPorId($id);
 
         if (!$producto) {
-            throw $this->createNotFoundException('El producto no existe');
+            return new JsonResponse(['error' => 'Producto no encontrado'], Response::HTTP_NOT_FOUND);
         }
 
         $this->productoService->eliminarProducto($producto);
 
-        return $this->redirectToRoute('listar_productos');
+        return new JsonResponse(['message' => 'Producto eliminado con éxito'], Response::HTTP_OK);
     }
 }

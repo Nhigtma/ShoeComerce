@@ -17,17 +17,17 @@ class FacturaController extends AbstractController
     public function __construct(FacturaService $facturaService, UsuarioService $usuarioService)
     {
         $this->facturaService = $facturaService;
-        $this->usuarioService= $usuarioService;
+        $this->usuarioService = $usuarioService;
     }
 
     /**
-     * @Route("/facturas", name="listar_facturas", methods={"GET"})
+     * @Route("/facturas", name="factura_listar", methods={"GET"})
      */
     public function listarFacturas(): Response
     {
         $facturas = $this->facturaService->obtenerTodasLasFacturas();
 
-        return $this->render('factura/lista.html.twig', [
+        return $this->json([
             'facturas' => $facturas,
         ]);
     }
@@ -37,13 +37,20 @@ class FacturaController extends AbstractController
      */
     public function crearFactura(Request $request): Response
     {
-        $usuarioId = $request->get('usuario_id');
-        $productosIds = $request->get('productos_ids');
-        $tipoDePago = $request->get('tipo_de_pago');
-        $total = $request->get('total');
+        // Obtener el contenido JSON de la solicitud
+        $data = json_decode($request->getContent(), true);
 
-        // Obtener el usuario (puedes modificar esto según tu lógica)
-        $usuario =$this->usuarioService->obtenerUsuarioPorId($usuarioId);
+        if (!$data) {
+            return new Response('Datos inválidos', Response::HTTP_BAD_REQUEST);
+        }
+
+        $usuarioId = $data['usuario_id'] ?? null;
+        $productosIds = $data['productos_ids'] ?? [];
+        $tipoDePago = $data['tipo_de_pago'] ?? '';
+        $total = $data['total'] ?? 0;
+
+        // Obtener el usuario
+        $usuario = $this->usuarioService->obtenerUsuarioPorId($usuarioId);
 
         if (!$usuario) {
             return new Response('Usuario no encontrado', Response::HTTP_NOT_FOUND);
@@ -52,6 +59,9 @@ class FacturaController extends AbstractController
         // Crear la factura usando el servicio
         $factura = $this->facturaService->crearFactura($usuario, $productosIds, $tipoDePago, $total);
 
-        return new Response('Factura creada con éxito', Response::HTTP_CREATED);
+        return $this->json([
+            'message' => 'Factura creada con éxito',
+            'factura' => $factura
+        ], Response::HTTP_CREATED);
     }
 }
