@@ -1,6 +1,14 @@
 twig:
-    file_name_pattern: '*.twig'
+    default_path: '%kernel.project_dir%/templates'
+    paths:
+        '%kernel.project_dir%/templates': ~
+    # Esta opción configura la ruta por defecto donde Twig buscará las plantillas
 
+    # Opcional: habilita la depuración de Twig
+    debug: '%kernel.debug%'
+    
+    # Opcional: habilita el caché de Twig
+    cache: '%kernel.cache_dir%/twig'
 when@test:
     twig:
         strict_variables: true

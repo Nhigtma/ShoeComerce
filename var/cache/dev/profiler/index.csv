@@ -1,4 +1,3 @@
-718c80,127.0.0.1,GET,http://127.0.0.1:8000/facturas,1725951267,ea15c4,500,request
-ea15c4,127.0.0.1,GET,http://127.0.0.1:8000/facturas,1725951267,,500,request
-6766fd,127.0.0.1,GET,http://127.0.0.1:8000/facturas,1725951425,47de3f,500,request
-47de3f,127.0.0.1,GET,http://127.0.0.1:8000/facturas,1725951425,,500,request
+1217d8,127.0.0.1,GET,http://127.0.0.1:8000/facturas,1725953843,4a67a1,500,request
+4a67a1,127.0.0.1,GET,http://127.0.0.1:8000/facturas,1725953843,,500,request
+150124,127.0.0.1,GET,http://127.0.0.1:8000/facturas,1725953925,,200,request

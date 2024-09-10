@@ -9,16 +9,22 @@ services:
         autowire: true
         autoconfigure: true
         public: true
+        arguments:
+            $documentManager: '@doctrine_mongodb.odm.document_manager'
 
     App\Service\UsuarioService:
         autowire: true
         autoconfigure: true
         public: true
+        arguments:
+            $documentManager: '@doctrine_mongodb.odm.document_manager'
 
     App\Service\ProductoService:
         autowire: true
         autoconfigure: true
         public: true
+        arguments:
+            $documentManager: '@doctrine_mongodb.odm.document_manager'
 
     App\Controller\LecturaCsvController:
         autowire: true

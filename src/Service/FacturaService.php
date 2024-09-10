@@ -3,19 +3,19 @@
 // src/Service/FacturaService.php
 namespace App\Service;
 
-use App\Entity\Factura;
-use App\Entity\Usuario;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Document\Factura;
+use App\Document\Usuario;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use App\Service\ProductoService;
 
 class FacturaService
 {
-    private $entityManager;
-    private $productoService;
+    private DocumentManager $documentManager;
+    private ProductoService $productoService;
 
-    public function __construct(EntityManagerInterface $entityManager, ProductoService $productoService)
+    public function __construct(DocumentManager $documentManager, ProductoService $productoService)
     {
-        $this->entityManager = $entityManager;
+        $this->documentManager = $documentManager;
         $this->productoService = $productoService;
     }
 
@@ -35,19 +35,19 @@ class FacturaService
             }
         }
 
-        $this->entityManager->persist($factura);
-        $this->entityManager->flush();
+        $this->documentManager->persist($factura);
+        $this->documentManager->flush();
 
         return $factura;
     }
 
-    public function obtenerFacturaPorId(int $id): ?Factura
+    public function obtenerFacturaPorId(string $id): ?Factura
     {
-        return $this->entityManager->getRepository(Factura::class)->find($id);
-
+        return $this->documentManager->getRepository(Factura::class)->find($id);
     }
+
     public function obtenerTodasLasFacturas(): array
     {
-        return $this->entityManager->getRepository(Factura::class)->findAll();
+        return $this->documentManager->getRepository(Factura::class)->findAll();
     }
 }

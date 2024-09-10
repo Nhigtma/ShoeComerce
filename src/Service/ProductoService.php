@@ -2,26 +2,26 @@
 
 namespace App\Service;
 
-use App\Entity\Producto;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Document\Producto;
+use Doctrine\ODM\MongoDB\DocumentManager;
 
 class ProductoService
 {
-    private $entityManager;
+    private DocumentManager $documentManager;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(DocumentManager $documentManager)
     {
-        $this->entityManager = $entityManager;
+        $this->documentManager = $documentManager;
     }
 
     public function obtenerTodosLosProductos(): array
     {
-        return $this->entityManager->getRepository(Producto::class)->findAll();
+        return $this->documentManager->getRepository(Producto::class)->findAll();
     }
 
-    public function obtenerProductoPorId(int $id): ?Producto
+    public function obtenerProductoPorId(string $id): ?Producto
     {
-        return $this->entityManager->getRepository(Producto::class)->find($id);
+        return $this->documentManager->getRepository(Producto::class)->find($id);
     }
 
     public function crearProducto(string $nombre, float $precio, string $marca, int $cantidad, string $descripcion): Producto
@@ -33,15 +33,15 @@ class ProductoService
             ->setCantidad($cantidad)
             ->setDescripcion($descripcion);
 
-        $this->entityManager->persist($producto);
-        $this->entityManager->flush();
+        $this->documentManager->persist($producto);
+        $this->documentManager->flush();
 
         return $producto;
     }
 
     public function eliminarProducto(Producto $producto): void
     {
-        $this->entityManager->remove($producto);
-        $this->entityManager->flush();
+        $this->documentManager->remove($producto);
+        $this->documentManager->flush();
     }
 }

@@ -27,7 +27,7 @@ class FacturaController extends AbstractController
     {
         $facturas = $this->facturaService->obtenerTodasLasFacturas();
 
-        return $this->render('factura/listar.html.twig', [
+        return $this->render('factura/lista.html.twig', [
             'facturas' => $facturas,
         ]);
     }

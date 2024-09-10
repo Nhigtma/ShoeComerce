@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\Producto;
+
 use App\Service\ProductoService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;

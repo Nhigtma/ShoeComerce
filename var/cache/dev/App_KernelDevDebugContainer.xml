@@ -378,14 +378,14 @@
       <tag name="routing.route_loader"/>
     </service>
     <service id="App\Service\FacturaService" class="App\Service\FacturaService" public="true" autowire="true" autoconfigure="true">
-      <argument type="service" id="doctrine.orm.default_entity_manager"/>
+      <argument type="service" id="doctrine_mongodb.odm.default_document_manager"/>
       <argument type="service" id="App\Service\ProductoService"/>
     </service>
     <service id="App\Service\UsuarioService" class="App\Service\UsuarioService" public="true" autowire="true" autoconfigure="true">
       <argument type="service" id="doctrine_mongodb.odm.default_document_manager"/>
     </service>
     <service id="App\Service\ProductoService" class="App\Service\ProductoService" public="true" autowire="true" autoconfigure="true">
-      <argument type="service" id="doctrine.orm.default_entity_manager"/>
+      <argument type="service" id="doctrine_mongodb.odm.default_document_manager"/>
     </service>
     <service id="App\Controller\LecturaCsvController" class="App\Controller\LecturaCsvController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
@@ -1256,6 +1256,7 @@
         <argument>C:\Proyecto\ShoeComerce\vendor\symfony\security-core/Resources/translations</argument>
       </argument>
       <argument type="collection">
+        <argument>C:\Proyecto\ShoeComerce/templates</argument>
         <argument>C:\Proyecto\ShoeComerce\vendor\symfony\twig-bridge/Resources/views/Email</argument>
         <argument>C:\Proyecto\ShoeComerce\vendor\symfony\twig-bridge/Resources/views/Form</argument>
       </argument>
@@ -1282,6 +1283,7 @@
         <argument>C:\Proyecto\ShoeComerce\vendor\symfony\security-core/Resources/translations</argument>
       </argument>
       <argument type="collection">
+        <argument>C:\Proyecto\ShoeComerce/templates</argument>
         <argument>C:\Proyecto\ShoeComerce\vendor\symfony\twig-bridge/Resources/views/Email</argument>
         <argument>C:\Proyecto\ShoeComerce\vendor\symfony\twig-bridge/Resources/views/Form</argument>
       </argument>
@@ -5752,9 +5754,9 @@
       <tag name="container.preload" class="Twig\TemplateWrapper"/>
       <argument type="service" id="twig.loader.native_filesystem"/>
       <argument type="collection">
+        <argument key="debug">true</argument>
         <argument key="cache">C:/Proyecto/ShoeComerce/var/cache/dev/twig</argument>
         <argument key="charset">UTF-8</argument>
-        <argument key="debug">true</argument>
         <argument key="strict_variables">true</argument>
         <argument key="autoescape">name</argument>
       </argument>
@@ -5877,13 +5879,12 @@
     <service id="twig.template_iterator" class="Symfony\Bundle\TwigBundle\TemplateIterator">
       <argument type="service" id="kernel"/>
       <argument type="collection">
+        <argument key="C:\Proyecto\ShoeComerce/templates">null</argument>
         <argument key="C:\Proyecto\ShoeComerce\vendor\symfony\twig-bridge/Resources/views/Email">email</argument>
         <argument key="C:\Proyecto\ShoeComerce\vendor\symfony\twig-bridge/Resources/views/Form">null</argument>
       </argument>
       <argument>C:\Proyecto\ShoeComerce/templates</argument>
-      <argument type="collection">
-        <argument>*.twig</argument>
-      </argument>
+      <argument type="collection"/>
     </service>
     <service id="twig.template_cache_warmer" class="Symfony\Bundle\TwigBundle\CacheWarmer\TemplateCacheWarmer">
       <tag name="kernel.cache_warmer"/>
@@ -5895,6 +5896,9 @@
       <tag name="twig.loader"/>
       <argument type="collection"/>
       <argument>C:\Proyecto\ShoeComerce</argument>
+      <call method="addPath">
+        <argument>C:\Proyecto\ShoeComerce/templates</argument>
+      </call>
       <call method="addPath">
         <argument>C:\Proyecto\ShoeComerce\vendor\doctrine\doctrine-bundle/templates</argument>
         <argument>Doctrine</argument>
@@ -7365,7 +7369,7 @@
         </argument>
         <argument key="driver" type="collection">
           <argument key="name">symfony-mongodb</argument>
-          <argument key="version">2.8.1</argument>
+          <argument key="version">2.8.2</argument>
         </argument>
       </argument>
     </service>
